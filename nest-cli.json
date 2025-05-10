@@ -17,6 +17,15 @@
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
     },
+    "gateway": {
+      "type": "application",
+      "root": "apps/gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/gateway/tsconfig.app.json"
+      }
+    },
     "products": {
       "type": "application",
       "root": "apps/products",
