@@ -8,7 +8,6 @@ COPY package.json pnpm-*.yaml ./
 COPY tsconfig.json tsconfig.json
 COPY nest-cli.json nest-cli.json
 
-RUN apk update && apk add --no-cache curl
 RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
 FROM deps AS dev
@@ -16,16 +15,16 @@ FROM deps AS dev
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
 
-COPY apps/products apps/products
+COPY apps/gateway apps/gateway
 COPY libs libs
 
-EXPOSE 3001
+EXPOSE 3002
 
-CMD ["pnpm", "start:dev", "products"]
+CMD ["pnpm", "start:dev", "gateway"]
 
 FROM deps AS builder
 
-COPY apps/products apps/products
+COPY apps/gateway apps/gateway
 COPY libs libs
 
 RUN pnpm build
@@ -46,6 +45,6 @@ COPY --from=builder /usr/src/app/dist ./dist
 
 RUN corepack enable pnpm && pnpm install --prod --frozen-lockfile
 
-EXPOSE 3001
+EXPOSE 3002
 
-CMD ["node", "dist/apps/products/main.js"]
+CMD ["node", "dist/apps/gateway/main.js"]
