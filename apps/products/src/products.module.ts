@@ -6,6 +6,7 @@ import {
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import * as Joi from 'joi';
 import { join } from 'path';
 import { CategoriesModule } from './categories/categories.module';
@@ -46,6 +47,9 @@ import { SpecificationsModule } from './specifications/specifications.module';
 
         HTTP_PORT: Joi.number().required(),
       }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'),
     }),
     DatabaseModule,
     DatabaseModule.forFeature([Product]),

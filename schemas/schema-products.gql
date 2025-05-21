@@ -68,16 +68,43 @@ type Category {
   products: [Product!]!
 }
 
+type ProductMetadataInput {
+  name: String!
+  shortDescription: String!
+  images: [Image!]!
+}
+
+type ProductStaticParamInput {
+  slug: String!
+  id: String!
+}
+
+type ProductsWithCountInput {
+  items: [Product!]!
+  total: Int!
+}
+
 type Query {
+  products(options: PaginationOptionsInput!): ProductsWithCountInput!
   bestsellers(take: Float!): [Product!]!
   newest(take: Float!): [Product!]!
+  productStaticParams: [ProductStaticParamInput!]!
+  productMetadata(id: String!): ProductMetadataInput!
   product(id: String!): Product!
+  otherProducts(id: String!, take: Float!): [Product!]!
   productBySku(sku: String!): Product!
   image(id: String!): Image!
   specification(id: String!): Specification!
   detail(id: String!): Detail!
   categories: [Category!]!
   category(id: String!): Category!
+}
+
+input PaginationOptionsInput {
+  take: Float!
+  skip: Float!
+  sort: String!
+  categoryIds: [ID!]!
 }
 
 type Mutation {
