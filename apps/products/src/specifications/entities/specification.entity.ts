@@ -3,7 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { Product } from '../../entities/product.entity';
 
-@Entity({ name: 'product_specifications' })
+@Entity('product_specifications')
 @ObjectType()
 export class Specification extends AbstractEntity<Specification> {
   @Column('varchar', { length: 100 })

@@ -14,7 +14,7 @@ import { Detail } from '../details/entities/detail.entity';
 import { Image } from '../images/entities/image.entity';
 import { Specification } from '../specifications/entities/specification.entity';
 
-@Entity({ name: 'products' })
+@Entity('products')
 @Index(['slug', 'sku'], { unique: true })
 @ObjectType()
 export class Product extends AbstractEntity<Product> {

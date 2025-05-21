@@ -3,7 +3,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, Index, ManyToMany } from 'typeorm';
 import { Product } from '../../entities/product.entity';
 
-@Entity({ name: 'product_category' })
+@Entity('categories')
 @Index(['slug'], { unique: true })
 @ObjectType()
 export class Category extends AbstractEntity<Category> {
