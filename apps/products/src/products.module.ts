@@ -12,7 +12,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import * as Joi from 'joi';
 import { join } from 'path';
 import { CategoriesModule } from './categories/categories.module';
@@ -32,10 +31,6 @@ import { SpecificationsModule } from './specifications/specifications.module';
   imports: [
     LoggerModule,
     HealthModule,
-    ServeStaticModule.forRoot({
-      serveRoot: '/public',
-      rootPath: join(process.cwd(), 'public'),
-    }),
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({

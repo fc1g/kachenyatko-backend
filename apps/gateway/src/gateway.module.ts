@@ -1,5 +1,5 @@
 import { IntrospectAndCompose } from '@apollo/gateway';
-import { LoggerModule } from '@app/common';
+import { HealthModule, LoggerModule } from '@app/common';
 import { ApolloGatewayDriver, ApolloGatewayDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -8,6 +8,16 @@ import * as Joi from 'joi';
 
 @Module({
   imports: [
+    LoggerModule,
+    HealthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: Joi.object({
+        HTTP_PORT: Joi.number().required(),
+
+        PRODUCTS_GRAPHQL_URL: Joi.string().required(),
+      }),
+    }),
     GraphQLModule.forRootAsync<ApolloGatewayDriverConfig>({
       driver: ApolloGatewayDriver,
       useFactory: (config: ConfigService) => ({
@@ -20,20 +30,12 @@ import * as Joi from 'joi';
               },
             ],
             subgraphHealthCheck: true,
+            pollIntervalInMs: 10000,
           }),
         },
       }),
       inject: [ConfigService],
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validationSchema: Joi.object({
-        HTTP_PORT: Joi.number().required(),
-
-        PRODUCTS_GRAPHQL_URL: Joi.string().required(),
-      }),
-    }),
-    LoggerModule,
   ],
   controllers: [],
   providers: [],
