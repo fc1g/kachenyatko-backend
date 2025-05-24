@@ -1,7 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { User } from '@app/common';
+import { FindOptionsWhere } from 'typeorm';
 
-export class GetUserDto {
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-}
+export class GetUserDto implements FindOptionsWhere<User> {}

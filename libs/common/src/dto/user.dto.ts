@@ -1,4 +1,5 @@
-import { Expose } from 'class-transformer';
+import { AuthProvider, RoleDto } from '@app/common';
+import { Expose, Type } from 'class-transformer';
 
 export class UserDto {
   @Expose()
@@ -12,4 +13,11 @@ export class UserDto {
 
   @Expose()
   email: string;
+
+  @Expose()
+  provider: AuthProvider | null;
+
+  @Expose()
+  @Type(() => RoleDto)
+  roles: RoleDto[];
 }

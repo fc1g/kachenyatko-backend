@@ -122,6 +122,7 @@ export class ProductsService {
     return this.repo.findOne({ id }, errorMessage, {
       relations: {
         images: true,
+        categories: true,
       },
     });
   }

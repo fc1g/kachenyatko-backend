@@ -1,10 +1,11 @@
-import { HealthModule, LoggerModule } from '@app/common';
+import { DatabaseModule, HealthModule, LoggerModule } from '@app/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import * as Joi from 'joi';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GoogleOauthStrategy } from './strategies/google-oauth.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { UsersModule } from './users/users.module';
@@ -26,6 +27,10 @@ import { UsersModule } from './users/users.module';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.number().required(),
 
+        OAUTH_GOOGLE_CLIENT_ID: Joi.string().required(),
+        OAUTH_GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        OAUTH_GOOGLE_CALLBACK_URL: Joi.string().required(),
+
         CORS_ORIGIN: Joi.string().required(),
 
         HTTP_PORT: Joi.number().required(),
@@ -41,9 +46,10 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
+    DatabaseModule,
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleOauthStrategy],
 })
 export class AuthModule {}

@@ -1,4 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { Category } from '../categories/entities/category.entity';
 import { Image } from '../images/entities/image.entity';
 
 @ObjectType()
@@ -11,4 +12,7 @@ export class ProductMetadataInput {
 
   @Field(() => [Image])
   images: Image[];
+
+  @Field(() => [Category])
+  categories: Category[];
 }
