@@ -8,13 +8,19 @@ import { EntityClassOrSchema } from '@nestjs/typeorm/dist/interfaces/entity-clas
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.getOrThrow<string>('TYPEORM_HOST'),
-        port: config.getOrThrow<number>('TYPEORM_PORT'),
-        username: config.getOrThrow<string>('TYPEORM_USERNAME'),
-        password: config.getOrThrow<string>('TYPEORM_PASSWORD'),
-        database: config.getOrThrow<string>('TYPEORM_DATABASE'),
-        synchronize: config.getOrThrow<boolean>('TYPEORM_SYNCHRONIZE'),
+        ...(process.env.NODE_ENV === 'production' && {
+          url: config.getOrThrow<string>('TYPEORM_URL'),
+          synchronize: false,
+        }),
+        ...(process.env.NODE_ENV === 'development' && {
+          type: 'postgres',
+          host: config.getOrThrow<string>('TYPEORM_HOST'),
+          port: config.getOrThrow<number>('TYPEORM_PORT'),
+          username: config.getOrThrow<string>('TYPEORM_USERNAME'),
+          password: config.getOrThrow<string>('TYPEORM_PASSWORD'),
+          database: config.getOrThrow<string>('TYPEORM_DATABASE'),
+          synchronize: config.getOrThrow<boolean>('TYPEORM_SYNCHRONIZE'),
+        }),
         autoLoadEntities: true,
       }),
       inject: [ConfigService],

@@ -49,7 +49,7 @@ export class AuthController {
       sameSite: 'lax',
       path: '/',
     });
-    return { message: 'Logged out successfully' };
+    return { statusCode: 200, message: 'Logged out successfully' };
   }
 
   @Get('google')

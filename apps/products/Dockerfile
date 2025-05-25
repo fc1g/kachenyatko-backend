@@ -12,7 +12,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY tsconfig.json nest-cli.json ./
 
 # Products package
-# COPY apps/products/package.json apps/products/
+COPY apps/products/package.json apps/products/
 
 RUN pnpm install --frozen-lockfile
 
@@ -49,7 +49,7 @@ RUN corepack enable pnpm
 COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/pnpm-lock.yaml ./
 COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./
-# COPY --from=builder /usr/src/app/apps/products/package.json apps/products/package.json
+COPY --from=builder /usr/src/app/apps/products/package.json apps/products/package.json
 
 COPY --from=builder /usr/src/app/dist ./dist
 

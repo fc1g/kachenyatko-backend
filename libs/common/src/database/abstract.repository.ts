@@ -33,14 +33,16 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
 
   async findOne(
     where: FindOptionsWhere<T>,
-    errorMessage?: string,
+    entityName: string,
     options?: FindOneOptions<T>,
   ): Promise<T> {
     const entity = await this.repo.findOne({ where, ...options });
 
     if (!entity) {
       this.logger.warn('Document not found with where', where);
-      throw new NotFoundException(errorMessage || 'Entity not found.');
+      throw new NotFoundException(
+        `${entityName} not found. Where: ${JSON.stringify(where)}`,
+      );
     }
 
     return entity;
@@ -48,20 +50,23 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
 
   async findOneAndUpdate(
     where: FindOptionsWhere<T>,
+    entityName: string,
     partialEntity: QueryDeepPartialEntity<T>,
   ): Promise<T> {
     const updateResult = await this.repo.update(where, partialEntity);
 
     if (!updateResult.affected) {
       this.logger.warn('Entity not found with where', where);
-      throw new NotFoundException('Entity not found.');
+      throw new NotFoundException(
+        `${entityName} not found. Where: ${JSON.stringify(where)}`,
+      );
     }
 
-    return this.findOne(where);
+    return this.findOne(where, entityName);
   }
 
-  async findOneAndDelete(where: FindOptionsWhere<T>) {
-    await this.findOne(where);
+  async findOneAndDelete(where: FindOptionsWhere<T>, entityName: string) {
+    await this.findOne(where, entityName);
     await this.repo.delete(where);
   }
 }

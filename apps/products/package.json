@@ -1,0 +1,23 @@
+{
+  "name": "products",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/apps/products/main.js",
+  "private": true,
+  "scripts": {
+    "build": "nest build auth",
+    "start": "nest start auth",
+    "start:dev": "nest start auth --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@nestjs/serve-static": "^5.0.3",
+    "backend": "workspace:*",
+    "nanoid": "^5.1.5",
+    "slugify": "^1.6.6"
+  },
+  "devDependencies": {},
+  "packageManager": "pnpm@10.11.0"
+}

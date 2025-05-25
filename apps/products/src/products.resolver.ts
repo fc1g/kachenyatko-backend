@@ -1,3 +1,4 @@
+import { StatusResponseDto } from '@app/common/dto/status-response.dto';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateProductInput } from './dto/create-product.input';
@@ -37,21 +38,6 @@ export class ProductsResolver {
     return this.productsService.findNewest(take);
   }
 
-  @Query(() => [ProductStaticParamInput], { name: 'productStaticParams' })
-  staticParams() {
-    return this.productsService.staticParams();
-  }
-
-  @Query(() => ProductMetadataInput, { name: 'productMetadata' })
-  productMetadata(@Args('id', ParseUUIDPipe) id: string) {
-    return this.productsService.metadata(id);
-  }
-
-  @Query(() => Product, { name: 'product' })
-  findOne(@Args('id', ParseUUIDPipe) id: string) {
-    return this.productsService.findOne(id);
-  }
-
   @Query(() => [Product], { name: 'otherProducts' })
   otherProducts(
     @Args('id', ParseUUIDPipe) id: string,
@@ -60,11 +46,27 @@ export class ProductsResolver {
     return this.productsService.otherProducts(id, take);
   }
 
-  @Query(() => Product, { name: 'productBySku' })
-  findOneBySku(@Args('sku', { type: () => String }) sku: string) {
-    return this.productsService.findOneBySku(sku);
+  @Query(() => [ProductStaticParamInput], { name: 'productStaticParams' })
+  staticParams() {
+    return this.productsService.staticParams();
   }
 
+  @Query(() => Product, { name: 'product' })
+  findOne(@Args('id', ParseUUIDPipe) id: string) {
+    return this.productsService.findOne({ id });
+  }
+
+  @Query(() => Product, { name: 'productBySku' })
+  findOneBySku(@Args('sku', { type: () => String }) sku: string) {
+    return this.productsService.findOne({ sku });
+  }
+
+  @Query(() => ProductMetadataInput, { name: 'productMetadata' })
+  productMetadata(@Args('id', ParseUUIDPipe) id: string) {
+    return this.productsService.metadata(id);
+  }
+
+  // HACK:
   @Mutation(() => Product, { name: 'updateProduct' })
   updateProduct(
     @Args('id', ParseUUIDPipe) id: string,
@@ -73,7 +75,7 @@ export class ProductsResolver {
     return this.productsService.update(id, updateProductInput);
   }
 
-  @Mutation(() => Boolean, { name: 'removeProduct' })
+  @Mutation(() => StatusResponseDto, { name: 'removeProduct' })
   removeProduct(@Args('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
   }

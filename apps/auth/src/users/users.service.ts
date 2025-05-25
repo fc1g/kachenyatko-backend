@@ -35,7 +35,7 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    return this.repo.findOneAndUpdate({ id }, updateUserDto);
+    return this.repo.findOneAndUpdate({ id }, 'User', updateUserDto);
   }
 
   async updateRoles(id: string, updateUserRolesDto: UpdateUserRolesDto) {
@@ -44,16 +44,16 @@ export class UsersService {
         this.rolesService.validateRole(role),
       ),
     );
-    return this.repo.findOneAndUpdate({ id }, { roles });
+    return this.repo.findOneAndUpdate({ id }, 'User', { roles });
   }
 
   async remove(id: string) {
-    return this.repo.findOneAndDelete({ id });
+    return this.repo.findOneAndDelete({ id }, 'User');
   }
 
   private async validateCreateUserDto(createUserDto: CreateUserDto) {
     try {
-      await this.repo.findOne({ email: createUserDto.email });
+      await this.getUser({ email: createUserDto.email });
     } catch (err) {
       console.error(err);
       return;
@@ -74,7 +74,7 @@ export class UsersService {
   }
 
   async getUser(getUserDto: GetUserDto) {
-    return this.repo.findOne(getUserDto, 'User not found', {
+    return this.repo.findOne(getUserDto, 'User', {
       relations: {
         roles: true,
       },

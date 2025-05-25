@@ -1,4 +1,4 @@
-import { formatNotFound, Role, RoleName } from '@app/common';
+import { Role, RoleName } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -18,17 +18,16 @@ export class RolesService {
   }
 
   findOne(id: string) {
-    const errorMessage = formatNotFound('Role', 'id', id);
-    return this.repo.findOne({ id }, errorMessage);
+    return this.repo.findOne({ id }, 'Role');
   }
 
   remove(id: string) {
-    return this.repo.findOneAndDelete({ id });
+    return this.repo.findOneAndDelete({ id }, 'Role');
   }
 
   async validateRole(name: RoleName) {
     try {
-      const role = await this.repo.findOne({ name });
+      const role = await this.findOne(name);
       return role;
     } catch (err) {
       console.error(err);

@@ -1,12 +1,13 @@
-import { formatNotFound } from '@app/common';
+import { StatusResponseDto } from '@app/common/dto/status-response.dto';
 import {
   Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
-import { In, Not } from 'typeorm';
+import { FindOptionsWhere, In, Not } from 'typeorm';
 import { CategoriesService } from './categories/categories.service';
+import { Category } from './categories/entities/category.entity';
 import { CreateProductInput } from './dto/create-product.input';
 import { PaginationOptionsInput } from './dto/pagination-options.input';
 import { ProductMetadataInput } from './dto/product-metadata.input';
@@ -39,10 +40,8 @@ export class ProductsService {
     });
 
     const categories = await Promise.all(
-      productInput.categoryIds.map((id) =>
-        this.categoriesService.findOne({ id }),
-      ),
-    );
+      productInput.categoryIds.map((id) => this.validateCategory(id)),
+    ).then((categories) => categories.filter((category) => category !== null));
 
     const product = plainToClass(Product, {
       ...productInput,
@@ -52,6 +51,17 @@ export class ProductsService {
     });
 
     return this.repo.create(product);
+  }
+
+  private async validateCategory(categoryId: string): Promise<Category | null> {
+    try {
+      const category = await this.categoriesService.findOne({ id: categoryId });
+
+      return category;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
   }
 
   async find({
@@ -107,47 +117,14 @@ export class ProductsService {
     });
   }
 
-  async staticParams(): Promise<ProductStaticParamInput[]> {
-    return this.repo.findAll({
-      select: {
-        id: true,
-        slug: true,
-      },
-    });
-  }
-
-  async metadata(id: string): Promise<ProductMetadataInput> {
-    const errorMessage = formatNotFound('Product', 'id', id);
-
-    return this.repo.findOne({ id }, errorMessage, {
-      relations: {
-        images: true,
-        categories: true,
-      },
-    });
-  }
-
-  async findOne(id: string): Promise<Product> {
-    const errorMessage = formatNotFound('Product', 'id', id);
-
-    return this.repo.findOne({ id }, errorMessage, {
-      order: { images: { position: 'ASC' } },
-      relations: {
-        images: true,
-        details: true,
-        specification: true,
-        categories: true,
-      },
-    });
-  }
-
   async otherProducts(id: string, take: number): Promise<Product[]> {
-    const product = await this.findOne(id);
+    const product = await this.findOne({ id });
 
-    const categoryIds = product.categories.map((category) => category.id);
-    if (categoryIds.length === 0) {
+    if (product.categories.length === 0) {
       return [];
     }
+
+    const categoryIds = product.categories.map((category) => category.id);
 
     return this.repo.findAll({
       where: {
@@ -164,10 +141,17 @@ export class ProductsService {
     });
   }
 
-  async findOneBySku(sku: string): Promise<Product> {
-    const errorMessage = formatNotFound('Product', 'sku', sku);
+  async staticParams(): Promise<ProductStaticParamInput[]> {
+    return this.repo.findAll({
+      select: {
+        id: true,
+        slug: true,
+      },
+    });
+  }
 
-    return this.repo.findOne({ sku }, errorMessage, {
+  async findOne(where: FindOptionsWhere<Product>): Promise<Product> {
+    return this.repo.findOne(where, 'Product', {
       order: { images: { position: 'ASC' } },
       relations: {
         images: true,
@@ -178,17 +162,29 @@ export class ProductsService {
     });
   }
 
+  async metadata(id: string): Promise<ProductMetadataInput> {
+    return this.repo.findOne({ id }, 'Product', {
+      relations: {
+        images: true,
+        categories: true,
+      },
+    });
+  }
+
+  // HACK:
   async update(
     id: string,
     updateProductInput: UpdateProductInput,
   ): Promise<Product> {
-    return this.repo.findOneAndUpdate({ id }, { ...updateProductInput });
+    return this.repo.findOneAndUpdate({ id }, 'Product', {
+      ...updateProductInput,
+    });
   }
 
-  async remove(id: string): Promise<boolean> {
+  async remove(id: string): Promise<StatusResponseDto> {
     try {
-      await this.repo.findOneAndDelete({ id });
-      return true;
+      await this.repo.findOneAndDelete({ id }, 'Product');
+      return { statusCode: 204, message: 'Product deleted successfully' };
     } catch (error) {
       this.logger.error(error);
       throw new InternalServerErrorException('Failed to delete product');

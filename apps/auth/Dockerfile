@@ -24,7 +24,7 @@ ENV NODE_ENV=${NODE_ENV}
 COPY apps/auth apps/auth
 COPY libs libs
 
-EXPOSE 3003
+EXPOSE 3002
 
 CMD ["pnpm", "start:dev", "auth"]
 
@@ -55,6 +55,6 @@ COPY --from=builder /usr/src/app/dist ./dist
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 
-EXPOSE 3003
+EXPOSE 3002
 
 CMD ["node", "dist/apps/auth/main.js"]

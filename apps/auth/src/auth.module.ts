@@ -17,12 +17,18 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        TYPEORM_HOST: Joi.string().required(),
-        TYPEORM_PORT: Joi.number().required(),
-        TYPEORM_USERNAME: Joi.string().required(),
-        TYPEORM_PASSWORD: Joi.string().required(),
-        TYPEORM_DATABASE: Joi.string().required(),
-        TYPEORM_SYNCHRONIZE: Joi.boolean().required(),
+        ...(process.env.NODE_ENV === 'development' && {
+          TYPEORM_HOST: Joi.string().required(),
+          TYPEORM_PORT: Joi.number().required(),
+          TYPEORM_USERNAME: Joi.string().required(),
+          TYPEORM_PASSWORD: Joi.string().required(),
+          TYPEORM_DATABASE: Joi.string().required(),
+          TYPEORM_SYNCHRONIZE: Joi.boolean().required(),
+        }),
+
+        ...(process.env.NODE_ENV === 'production' && {
+          TYPEORM_URL: Joi.string().required(),
+        }),
 
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.number().required(),
@@ -38,6 +44,7 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     JwtModule.registerAsync({
+      imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
         signOptions: {

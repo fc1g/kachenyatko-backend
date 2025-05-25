@@ -24,7 +24,7 @@ ENV NODE_ENV=${NODE_ENV}
 COPY apps/gateway apps/gateway
 COPY libs libs
 
-EXPOSE 3002
+EXPOSE 3005
 
 CMD ["pnpm", "start:dev", "gateway"]
 
@@ -55,6 +55,6 @@ COPY --from=builder /usr/src/app/dist ./dist
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 
-EXPOSE 3002
+EXPOSE 3005
 
 CMD ["node", "dist/apps/gateway/main.js"]

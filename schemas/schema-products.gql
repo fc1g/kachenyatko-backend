@@ -68,6 +68,11 @@ type Category {
   products: [Product!]!
 }
 
+type StatusResponseDto {
+  statusCode: Float!
+  message: String!
+}
+
 type ProductMetadataInput {
   name: String!
   shortDescription: String!
@@ -89,14 +94,11 @@ type Query {
   products(options: PaginationOptionsInput!): ProductsWithCountInput!
   bestsellers(take: Float!): [Product!]!
   newest(take: Float!): [Product!]!
-  productStaticParams: [ProductStaticParamInput!]!
-  productMetadata(id: String!): ProductMetadataInput!
-  product(id: String!): Product!
   otherProducts(id: String!, take: Float!): [Product!]!
+  productStaticParams: [ProductStaticParamInput!]!
+  product(id: String!): Product!
   productBySku(sku: String!): Product!
-  image(id: String!): Image!
-  specification(id: String!): Specification!
-  detail(id: String!): Detail!
+  productMetadata(id: String!): ProductMetadataInput!
   categories: [Category!]!
   category(id: String!): Category!
 }
@@ -111,7 +113,7 @@ input PaginationOptionsInput {
 type Mutation {
   createProduct(createProductInput: CreateProductInput!): Product!
   updateProduct(id: String!, updateProductInput: UpdateProductInput!): Product!
-  removeProduct(id: String!): Boolean!
+  removeProduct(id: String!): StatusResponseDto!
   createCategory(createCategoryInput: CreateCategoryInput!): Category!
   updateCategory(id: String!, updateCategoryInput: UpdateCategoryInput!): Category!
   removeCategory(id: String!): Category!
