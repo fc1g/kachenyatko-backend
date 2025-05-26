@@ -1,4 +1,3 @@
-import { RoleDto, Serialize } from '@app/common';
 import {
   Body,
   Controller,
@@ -8,12 +7,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+
+import { ROLE_NAME, RoleDto, Roles, RolesGuard, Serialize } from '@app/common';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RolesService } from './roles.service';
 
 @Serialize(RoleDto)
-@UseGuards(JwtAuthGuard)
 @Controller('roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
@@ -24,16 +24,22 @@ export class RolesController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(ROLE_NAME.ADMIN, ROLE_NAME.MODERATOR)
   findAll() {
     return this.rolesService.findAll();
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(ROLE_NAME.ADMIN, ROLE_NAME.MODERATOR)
   findOne(@Param('id') id: string) {
     return this.rolesService.findOne(id);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(ROLE_NAME.ADMIN, ROLE_NAME.MODERATOR)
   remove(@Param('id') id: string) {
     return this.rolesService.remove(id);
   }

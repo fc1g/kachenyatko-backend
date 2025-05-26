@@ -1,4 +1,4 @@
-import { RoleName } from '@app/common';
 import { SetMetadata } from '@nestjs/common';
+import { ROLE_KEY, ROLE_NAME } from '../constants';
 
-export const Roles = (...roles: RoleName[]) => SetMetadata('roles', roles);
+export const Roles = (...roles: ROLE_NAME[]) => SetMetadata(ROLE_KEY, roles);

@@ -13,6 +13,7 @@ COPY tsconfig.json nest-cli.json ./
 
 # Products package
 COPY apps/products/package.json apps/products/
+COPY apps/products/pnpm-lock.yaml apps/products/
 
 RUN pnpm install --frozen-lockfile
 
@@ -52,8 +53,6 @@ COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./
 COPY --from=builder /usr/src/app/apps/products/package.json apps/products/package.json
 
 COPY --from=builder /usr/src/app/dist ./dist
-
-COPY apps/products/public ./public
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 

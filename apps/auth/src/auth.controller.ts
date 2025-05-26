@@ -8,7 +8,6 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -20,15 +19,12 @@ import { CreateUserDto } from './users/dto/create-user.dto';
 
 @Controller()
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   @UseGuards(LocalAuthGuard)
   login(@CurrentUser() user: User, @Res({ passthrough: true }) res: Response) {
-    return this.authService.login(user, res);
+    return this.authService.signToken(user, res);
   }
 
   @Serialize(SignedUpDto)
@@ -37,7 +33,7 @@ export class AuthController {
     @Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.authService.signUp(createUserDto, res);
+    return this.authService.signup(createUserDto, res);
   }
 
   @Post('logout')
@@ -62,17 +58,11 @@ export class AuthController {
     @CurrentUser() payload: GoogleTokenPayload,
     @Res() res: Response,
   ) {
-    const user = await this.authService.validateOAuthLogin(payload);
-
-    this.authService.login(user, res);
-
-    return res.redirect(
-      `${this.configService.getOrThrow('CORS_ORIGIN')}/account`,
-    );
+    return this.authService.loginWithGoogle(payload, res);
   }
 
-  @UseGuards(JwtAuthGuard)
   @MessagePattern('authenticate')
+  @UseGuards(JwtAuthGuard)
   authenticate(@Payload() data: { user: User }) {
     return data.user;
   }

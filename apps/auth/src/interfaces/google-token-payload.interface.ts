@@ -1,7 +1,7 @@
-import { AuthProvider } from '@app/common';
+import { AUTH_PROVIDER } from '@app/common';
 
 export interface GoogleTokenPayload {
-  provider: AuthProvider;
+  provider: AUTH_PROVIDER;
   providerId: string;
   email: string;
   firstName: string;

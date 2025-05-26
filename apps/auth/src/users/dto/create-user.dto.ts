@@ -1,4 +1,4 @@
-import { AuthProvider } from '@app/common';
+import { AUTH_PROVIDER } from '@app/common';
 import { IsEmail, IsEnum, IsOptional, IsStrongPassword } from 'class-validator';
 
 export class CreateUserDto {
@@ -6,8 +6,8 @@ export class CreateUserDto {
   email: string;
 
   @IsOptional()
-  @IsEnum(AuthProvider)
-  provider: AuthProvider | null;
+  @IsEnum(AUTH_PROVIDER)
+  provider: AUTH_PROVIDER | null;
 
   @IsOptional()
   @IsStrongPassword()

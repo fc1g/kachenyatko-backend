@@ -1,9 +1,5 @@
 import { StatusResponseDto } from '@app/common/dto/status-response.dto';
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { FindOptionsWhere, In, Not } from 'typeorm';
 import { CategoriesService } from './categories/categories.service';
@@ -187,7 +183,7 @@ export class ProductsService {
       return { statusCode: 204, message: 'Product deleted successfully' };
     } catch (error) {
       this.logger.error(error);
-      throw new InternalServerErrorException('Failed to delete product');
+      return { statusCode: 500, message: 'Failed to delete product' };
     }
   }
 }

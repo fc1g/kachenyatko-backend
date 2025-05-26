@@ -1,4 +1,4 @@
-import { AuthProvider } from '@app/common';
+import { AUTH_PROVIDER } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -30,7 +30,7 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy) {
     const { id, name, emails } = profile;
 
     const user: GoogleTokenPayload = {
-      provider: AuthProvider.GOOGLE,
+      provider: AUTH_PROVIDER.GOOGLE,
       providerId: id,
       email: emails[0].value,
       firstName: name.givenName,

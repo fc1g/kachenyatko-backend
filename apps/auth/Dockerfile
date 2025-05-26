@@ -13,6 +13,7 @@ COPY tsconfig.json nest-cli.json ./
 
 # Auth package
 COPY apps/auth/package.json apps/auth/
+COPY apps/auth/pnpm-lock.yaml apps/auth/
 
 RUN pnpm install --frozen-lockfile
 

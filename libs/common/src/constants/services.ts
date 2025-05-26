@@ -1,1 +1,3 @@
-export const AUTH_SERVICE = 'auth';
+export enum SERVICE {
+  AUTH = 'auth',
+}

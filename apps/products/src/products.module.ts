@@ -1,11 +1,17 @@
-import { DatabaseModule, HealthModule, LoggerModule } from '@app/common';
+import {
+  DatabaseModule,
+  HealthModule,
+  LoggerModule,
+  SERVICE,
+} from '@app/common';
 import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import * as Joi from 'joi';
 import { join } from 'path';
 import { CategoriesModule } from './categories/categories.module';
@@ -15,6 +21,7 @@ import { Detail } from './details/entities/detail.entity';
 import { Product } from './entities/product.entity';
 import { Image } from './images/entities/image.entity';
 import { ImagesModule } from './images/images.module';
+import { ProductsController } from './products.controller';
 import { ProductsRepository } from './products.repository';
 import { ProductsResolver } from './products.resolver';
 import { ProductsService } from './products.service';
@@ -49,6 +56,19 @@ import { SpecificationsModule } from './specifications/specifications.module';
         HTTP_PORT: Joi.number().required(),
       }),
     }),
+    ClientsModule.registerAsync([
+      {
+        name: SERVICE.AUTH,
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: config.getOrThrow<string>('AUTH_HOST'),
+            port: config.getOrThrow<number>('AUTH_PORT'),
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
       autoSchemaFile: {
@@ -66,7 +86,7 @@ import { SpecificationsModule } from './specifications/specifications.module';
     DetailsModule,
     CategoriesModule,
   ],
-  controllers: [],
+  controllers: [ProductsController],
   providers: [ProductsService, ProductsRepository, ProductsResolver],
 })
 export class ProductsModule {}

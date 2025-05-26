@@ -36,6 +36,7 @@ import { UsersModule } from './users/users.module';
         OAUTH_GOOGLE_CLIENT_ID: Joi.string().required(),
         OAUTH_GOOGLE_CLIENT_SECRET: Joi.string().required(),
         OAUTH_GOOGLE_CALLBACK_URL: Joi.string().required(),
+        OAUTH_GOOGLE_REDIRECT_URL: Joi.string().required(),
 
         CORS_ORIGIN: Joi.string().required(),
 
@@ -44,7 +45,6 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     JwtModule.registerAsync({
-      imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>('JWT_SECRET'),
         signOptions: {

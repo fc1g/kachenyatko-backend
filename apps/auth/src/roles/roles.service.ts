@@ -1,38 +1,50 @@
-import { Role, RoleName } from '@app/common';
-import { Injectable } from '@nestjs/common';
+import { Role, StatusResponseDto } from '@app/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { CreateRoleDto } from './dto/create-role.dto';
+import { GetRoleDto } from './dto/get-role.dto';
 import { RolesRepository } from './roles.repository';
 
 @Injectable()
 export class RolesService {
   constructor(private readonly repo: RolesRepository) {}
 
-  create(createRoleDto: CreateRoleDto) {
+  async create(createRoleDto: CreateRoleDto): Promise<Role> {
+    await this.validateCreateRole(createRoleDto);
     const role = plainToClass(Role, { ...createRoleDto });
     return this.repo.create(role);
   }
 
-  findAll() {
+  async findAll(): Promise<Role[]> {
     return this.repo.findAll({});
   }
 
-  findOne(id: string) {
-    return this.repo.findOne({ id }, 'Role');
+  async findOne(where: GetRoleDto): Promise<Role> {
+    return this.repo.findOne(where, 'Role');
   }
 
-  remove(id: string) {
-    return this.repo.findOneAndDelete({ id }, 'Role');
-  }
-
-  async validateRole(name: RoleName) {
+  async remove(id: string): Promise<StatusResponseDto> {
     try {
-      const role = await this.findOne(name);
-      return role;
+      await this.repo.findOneAndDelete({ id }, 'Role');
+      return { statusCode: 204, message: 'Role deleted successfully' };
+    } catch (err) {
+      return {
+        statusCode: 500,
+        message: err instanceof Error ? err.message : 'Failed to delete role',
+      };
+    }
+  }
+
+  private async validateCreateRole(
+    createUserDto: CreateRoleDto,
+  ): Promise<void> {
+    try {
+      await this.findOne({ name: createUserDto.name });
     } catch (err) {
       console.error(err);
-      const role = await this.create({ name });
-      return role;
+      return;
     }
+
+    throw new UnprocessableEntityException('Email already exists');
   }
 }

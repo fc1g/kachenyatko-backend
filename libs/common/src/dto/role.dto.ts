@@ -1,5 +1,5 @@
-import { RoleName } from '@app/common';
 import { Expose } from 'class-transformer';
+import { ROLE_NAME } from '../constants';
 
 export class RoleDto {
   @Expose()
@@ -12,5 +12,5 @@ export class RoleDto {
   updatedAt: Date;
 
   @Expose()
-  name: RoleName;
+  name: ROLE_NAME;
 }

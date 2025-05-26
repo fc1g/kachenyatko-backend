@@ -2,7 +2,7 @@
   "name": "auth",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/main.js",
+  "main": "dist/apps/auth/main.js",
   "private": true,
   "scripts": {
     "build": "nest build auth",

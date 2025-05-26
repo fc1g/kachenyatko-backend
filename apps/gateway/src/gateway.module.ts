@@ -19,7 +19,6 @@ import * as Joi from 'joi';
       }),
     }),
     GraphQLModule.forRootAsync<ApolloGatewayDriverConfig>({
-      imports: [ConfigModule],
       driver: ApolloGatewayDriver,
       useFactory: (config: ConfigService) => ({
         gateway: {

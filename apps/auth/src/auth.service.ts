@@ -1,5 +1,5 @@
-import { AuthProvider, User } from '@app/common';
-import { Injectable } from '@nestjs/common';
+import { AUTH_PROVIDER, User } from '@app/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
@@ -10,13 +10,14 @@ import { UsersService } from './users/users.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
   ) {}
 
-  login(user: User, res: Response) {
+  signToken(user: User, res: Response) {
     const tokenPayload: TokenPayload = {
       userId: user.id.toString(),
     };
@@ -39,26 +40,37 @@ export class AuthService {
     return { token };
   }
 
-  async signUp(createUserDto: CreateUserDto, res: Response) {
+  async signup(createUserDto: CreateUserDto, res: Response) {
     const user = await this.usersService.create(createUserDto);
 
-    const { token } = this.login(user, res);
+    const { token } = this.signToken(user, res);
 
     return { user, token };
   }
 
-  async validateOAuthLogin(payload: GoogleTokenPayload): Promise<User> {
+  async loginWithGoogle(payload: GoogleTokenPayload, res: Response) {
     try {
       const user = await this.usersService.getUser({ email: payload.email });
 
-      return user;
+      if (!user) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      this.signToken(user, res);
     } catch (err) {
-      console.error(err);
-      return this.usersService.create({
+      this.logger.error(err);
+
+      const user = await this.usersService.create({
         email: payload.email,
         password: null,
-        provider: AuthProvider.GOOGLE,
+        provider: AUTH_PROVIDER.GOOGLE,
       });
+
+      this.signToken(user, res);
     }
+
+    return res.redirect(
+      this.configService.getOrThrow<string>('OAUTH_GOOGLE_REDIRECT_URL'),
+    );
   }
 }
