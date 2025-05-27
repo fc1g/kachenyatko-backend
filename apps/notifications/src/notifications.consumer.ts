@@ -35,7 +35,8 @@ export class NotificationsConsumer implements OnModuleInit {
       'PROMO_NOTIFICATIONS_QUEUE',
     );
 
-    const rabbitmqUrl = this.configService.getOrThrow<string>('RABBITMQ_URL');
+    const rabbitmqUrl =
+      this.configService.getOrThrow<string>('RABBITMQ_RPC_URL');
     const connection = connect([rabbitmqUrl], { reconnectTimeInSeconds: 5 });
 
     connection.on('connect', () => this.logger.log('✅ Connected to RabbitMQ'));

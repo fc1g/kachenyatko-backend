@@ -1,4 +1,13 @@
-import { CurrentUser, Serialize, SignedUpDto, User } from '@app/common';
+import {
+  Authentication,
+  AuthServiceController,
+  AuthServiceControllerMethods,
+  CurrentUser,
+  Serialize,
+  SignedUpDto,
+  User,
+  UserMessage,
+} from '@app/common';
 import {
   Body,
   Controller,
@@ -8,7 +17,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Payload } from '@nestjs/microservices';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleOauthGuard } from './guards/google-oauth.guard';
@@ -18,7 +27,8 @@ import { GoogleTokenPayload } from './interfaces/google-token-payload.interface'
 import { CreateUserDto } from './users/dto/create-user.dto';
 
 @Controller()
-export class AuthController {
+@AuthServiceControllerMethods()
+export class AuthController implements AuthServiceController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
@@ -61,9 +71,10 @@ export class AuthController {
     return this.authService.loginWithGoogle(payload, res);
   }
 
-  @MessagePattern('authenticate')
   @UseGuards(JwtAuthGuard)
-  authenticate(@Payload() data: { user: User }) {
-    return data.user;
+  authenticate(
+    @Payload() request: Authentication & { user: UserMessage },
+  ): UserMessage {
+    return request.user;
   }
 }

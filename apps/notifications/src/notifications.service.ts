@@ -140,7 +140,8 @@ export class NotificationsService {
   }
 
   private setupRabbitMQChannel(): ChannelWrapper {
-    const rabbitmqUrl = this.configService.getOrThrow<string>('RABBITMQ_URL');
+    const rabbitmqUrl =
+      this.configService.getOrThrow<string>('RABBITMQ_RPC_URL');
     const connection = connect([rabbitmqUrl], { reconnectTimeInSeconds: 5 });
 
     connection.on('connect', () => this.logger.log('✅ Connected to RabbitMQ'));

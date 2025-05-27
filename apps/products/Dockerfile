@@ -24,6 +24,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY apps/products apps/products
 COPY libs libs
+COPY proto proto
 
 EXPOSE 3001
 
@@ -33,6 +34,7 @@ FROM deps AS builder
 
 COPY apps/products apps/products
 COPY libs libs
+COPY proto proto
 
 RUN pnpm build products
 
@@ -54,6 +56,7 @@ COPY --from=builder /usr/src/app/apps/products/package.json apps/products/packag
 COPY --from=builder /usr/src/app/apps/products/pnpm-lock.yaml apps/products/pnpm-lock.yaml
 
 COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/proto ./proto
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 

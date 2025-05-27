@@ -41,7 +41,7 @@ import { UsersModule } from './users/users.module';
         CORS_ORIGIN: Joi.string().required(),
 
         HTTP_PORT: Joi.number().required(),
-        TCP_PORT: Joi.number().required(),
+        AUTH_GRPC_URL: Joi.string().required(),
       }),
     }),
     JwtModule.registerAsync({

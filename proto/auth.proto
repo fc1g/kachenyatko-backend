@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package auth;
+
+import "google/protobuf/timestamp.proto";
+
+service AuthService {
+  rpc Authenticate(Authentication) returns (UserMessage) {}
+}
+
+message Authentication {
+  string Authentication = 1;
+}
+
+message UserMessage {
+  string id = 1;
+  google.protobuf.Timestamp createdAt = 2;
+  google.protobuf.Timestamp updatedAt = 3;
+  string email = 4;
+  string password = 5;
+  string provider = 6;
+  repeated Role roles = 7;
+}
+
+message Role {
+  string id = 1;
+  google.protobuf.Timestamp createdAt = 2;
+  google.protobuf.Timestamp updatedAt = 3;
+  string name = 4;
+}

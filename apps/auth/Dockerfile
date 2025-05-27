@@ -24,6 +24,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY apps/auth apps/auth
 COPY libs libs
+COPY proto proto
 
 EXPOSE 3002
 
@@ -33,6 +34,7 @@ FROM deps AS builder
 
 COPY apps/auth apps/auth
 COPY libs libs
+COPY proto proto
 
 RUN pnpm build auth
 
@@ -54,6 +56,7 @@ COPY --from=builder /usr/src/app/apps/auth/package.json apps/auth/package.json
 COPY --from=builder /usr/src/app/apps/auth/pnpm-lock.yaml apps/auth/pnpm-lock.yaml
 
 COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/proto ./proto
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 

@@ -12,8 +12,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY tsconfig.json nest-cli.json ./
 
 # Gateway package
-# COPY apps/gateway/package.json apps/gateway/
-# COPY apps/gateway/pnpm-lock.yaml apps/gateway/
+COPY apps/gateway/package.json apps/gateway/
+COPY apps/gateway/pnpm-lock.yaml apps/gateway/
 
 RUN pnpm install --frozen-lockfile
 
@@ -24,6 +24,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY apps/gateway apps/gateway
 COPY libs libs
+COPY proto proto
 
 EXPOSE 3005
 
@@ -33,6 +34,7 @@ FROM deps AS builder
 
 COPY apps/gateway apps/gateway
 COPY libs libs
+COPY proto proto
 
 RUN pnpm build gateway
 
@@ -50,10 +52,11 @@ RUN corepack enable pnpm
 COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/pnpm-lock.yaml ./
 COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./
-# COPY --from=builder /usr/src/app/apps/gateway/package.json apps/gateway/package.json
-# COPY --from=builder /usr/src/app/apps/gateway/pnpm-lock.yaml apps/gateway/pnpm-lock.yaml
+COPY --from=builder /usr/src/app/apps/gateway/package.json apps/gateway/package.json
+COPY --from=builder /usr/src/app/apps/gateway/pnpm-lock.yaml apps/gateway/pnpm-lock.yaml
 
 COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/proto ./proto
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 

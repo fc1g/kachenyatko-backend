@@ -1,0 +1,20 @@
+{
+  "name": "gateway",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/apps/gateway/main.js",
+  "private": true,
+  "scripts": {
+    "build": "nest build gateway",
+    "start": "nest start gateway",
+    "start:dev": "nest start gateway --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "backend": "workspace:*"
+  },
+  "devDependencies": {},
+  "packageManager": "pnpm@10.11.0"
+}

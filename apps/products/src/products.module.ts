@@ -1,4 +1,6 @@
 import {
+  AUTH_PACKAGE_NAME,
+  AUTH_SERVICE_NAME,
   DatabaseModule,
   HealthModule,
   LoggerModule,
@@ -50,23 +52,23 @@ import { SpecificationsModule } from './specifications/specifications.module';
 
         CORS_ORIGIN: Joi.string().required(),
 
-        AUTH_HOST: Joi.string().required(),
-        AUTH_PORT: Joi.number().required(),
+        AUTH_GRPC_URL: Joi.string().required(),
 
-        RABBITMQ_URL: Joi.string().required(),
-        RABBITMQ_QUEUE: Joi.string().required(),
+        RABBITMQ_RPC_URL: Joi.string().required(),
+        RABBITMQ_RPC_QUEUE: Joi.string().required(),
 
         HTTP_PORT: Joi.number().required(),
       }),
     }),
     ClientsModule.registerAsync([
       {
-        name: SERVICE.AUTH,
+        name: AUTH_SERVICE_NAME,
         useFactory: (config: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.GRPC,
           options: {
-            host: config.getOrThrow<string>('AUTH_HOST'),
-            port: config.getOrThrow<number>('AUTH_PORT'),
+            package: AUTH_PACKAGE_NAME,
+            protoPath: join(__dirname, '../../../proto/auth.proto'),
+            url: config.getOrThrow<string>('AUTH_GRPC_URL'),
           },
         }),
         inject: [ConfigService],
@@ -76,9 +78,9 @@ import { SpecificationsModule } from './specifications/specifications.module';
         useFactory: (config: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
-            urls: [config.getOrThrow<string>('RABBITMQ_URL')],
-            queue: config.getOrThrow<string>('RABBITMQ_QUEUE'),
-queueOptions: {
+            urls: [config.getOrThrow<string>('RABBITMQ_RPC_URL')],
+            queue: config.getOrThrow<string>('RABBITMQ_RPC_QUEUE'),
+            queueOptions: {
               durable: true,
             },
           },

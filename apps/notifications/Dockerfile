@@ -24,6 +24,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 COPY apps/notifications apps/notifications
 COPY libs libs
+COPY proto proto
   
 CMD ["pnpm", "start:dev", "notifications"]
 
@@ -31,6 +32,7 @@ FROM deps AS builder
 
 COPY apps/notifications apps/notifications
 COPY libs libs
+COPY proto proto
 
 RUN pnpm build notifications
 
@@ -52,6 +54,7 @@ COPY --from=builder /usr/src/app/apps/notifications/package.json apps/notificati
 COPY --from=builder /usr/src/app/apps/notifications/pnpm-lock.yaml apps/notifications/pnpm-lock.yaml
 
 COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/proto ./proto
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 

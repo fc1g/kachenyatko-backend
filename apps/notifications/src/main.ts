@@ -13,8 +13,8 @@ void (async function bootstrap() {
   app.connectMicroservice({
     transport: Transport.RMQ,
     options: {
-      urls: [configService.getOrThrow<string>('RABBITMQ_URL')],
-      queue: configService.getOrThrow<string>('RABBITMQ_QUEUE'),
+      urls: [configService.getOrThrow<string>('RABBITMQ_RPC_URL')],
+      queue: configService.getOrThrow<string>('RABBITMQ_RPC_QUEUE'),
       queueOptions: {
         noAck: false,
         durable: true,

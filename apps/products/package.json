@@ -5,9 +5,9 @@
   "main": "dist/apps/products/main.js",
   "private": true,
   "scripts": {
-    "build": "nest build auth",
-    "start": "nest start auth",
-    "start:dev": "nest start auth --watch"
+    "build": "nest build products",
+    "start": "nest start products",
+    "start:dev": "nest start products --watch"
   },
   "keywords": [],
   "author": "",

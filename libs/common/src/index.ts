@@ -7,3 +7,4 @@ export * from './entities';
 export * from './health';
 export * from './interfaces';
 export * from './logger';
+export * from './types';
