@@ -53,6 +53,9 @@ import { SpecificationsModule } from './specifications/specifications.module';
         AUTH_HOST: Joi.string().required(),
         AUTH_PORT: Joi.number().required(),
 
+        RABBITMQ_URL: Joi.string().required(),
+        RABBITMQ_QUEUE: Joi.string().required(),
+
         HTTP_PORT: Joi.number().required(),
       }),
     }),
@@ -71,10 +74,13 @@ import { SpecificationsModule } from './specifications/specifications.module';
       {
         name: SERVICE.NOTIFICATIONS,
         useFactory: (config: ConfigService) => ({
-          transport: Transport.TCP,
+          transport: Transport.RMQ,
           options: {
-            host: config.getOrThrow<string>('NOTIFICATIONS_HOST'),
-            port: config.getOrThrow<number>('NOTIFICATIONS_PORT'),
+            urls: [config.getOrThrow<string>('RABBITMQ_URL')],
+            queue: config.getOrThrow<string>('RABBITMQ_QUEUE'),
+queueOptions: {
+              durable: true,
+            },
           },
         }),
         inject: [ConfigService],

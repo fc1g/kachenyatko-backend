@@ -1,7 +1,8 @@
 import { JwtAuthGuard, ROLE_NAME, Roles } from '@app/common';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { NotifyEmailDto } from './dto/notify-email.dto';
+import { PromoPayloadDto } from './dto/promo-payload.dto';
 import { SubscriptionDto } from './dto/subscription.dto';
 import { NotificationsService } from './notifications.service';
 
@@ -19,11 +20,11 @@ export class NotificationsController {
     return this.notificationsService.unsubscribeFromNewsletter(body);
   }
 
-  @Get('send-promo')
+  @Post('send-promo')
   @UseGuards(JwtAuthGuard)
   @Roles(ROLE_NAME.ADMIN, ROLE_NAME.MODERATOR)
-  async sendPromo() {
-    return this.notificationsService.sendPromo();
+  async sendPromo(@Body() body: PromoPayloadDto) {
+    return this.notificationsService.sendPromo(body);
   }
 
   // TODO: remove this

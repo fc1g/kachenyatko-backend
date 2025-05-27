@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import * as Joi from 'joi';
 import { NewsletterSubscription } from './entities/newsletter-subscription.entity';
+import { NotificationsConsumer } from './notifications.consumer';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsRepository } from './notifications.repository';
 import { NotificationsService } from './notifications.service';
@@ -43,8 +44,11 @@ import { NotificationsService } from './notifications.service';
 
         CORS_ORIGIN: Joi.string().required(),
 
+        RABBITMQ_URL: Joi.string().required(),
+        RABBITMQ_QUEUE: Joi.string().required(),
+        PROMO_NOTIFICATIONS_QUEUE: Joi.string().required(),
+
         HTTP_PORT: Joi.number().required(),
-        TCP_PORT: Joi.number().required(),
       }),
     }),
     ClientsModule.registerAsync([
@@ -64,6 +68,10 @@ import { NotificationsService } from './notifications.service';
     DatabaseModule.forFeature([NewsletterSubscription]),
   ],
   controllers: [NotificationsController],
-  providers: [NotificationsService, NotificationsRepository],
+  providers: [
+    NotificationsService,
+    NotificationsRepository,
+    NotificationsConsumer,
+  ],
 })
 export class NotificationsModule {}

@@ -6,5 +6,9 @@ export class NotifyEmailDto {
 
   @IsString()
   @IsNotEmpty()
+  subject: string;
+
+  @IsString()
+  @IsNotEmpty()
   text: string;
 }
