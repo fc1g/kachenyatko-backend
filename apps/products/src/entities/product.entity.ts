@@ -15,7 +15,7 @@ import { Image } from '../images/entities/image.entity';
 import { Specification } from '../specifications/entities/specification.entity';
 
 @Entity('products')
-@Index(['slug', 'sku'], { unique: true })
+@Index(['sku'], { unique: true })
 @ObjectType()
 export class Product extends AbstractEntity<Product> {
   @Column('varchar', { length: 100 })

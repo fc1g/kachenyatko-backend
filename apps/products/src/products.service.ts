@@ -1,5 +1,8 @@
+import { SERVICE } from '@app/common';
 import { StatusResponseDto } from '@app/common/dto/status-response.dto';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { NotifyEmailDto } from 'apps/notifications/src/dto/notify-email.dto';
 import { plainToClass } from 'class-transformer';
 import { FindOptionsWhere, In, Not } from 'typeorm';
 import { CategoriesService } from './categories/categories.service';
@@ -20,7 +23,13 @@ export class ProductsService {
   constructor(
     private readonly repo: ProductsRepository,
     private readonly categoriesService: CategoriesService,
+    @Inject(SERVICE.NOTIFICATIONS)
+    private readonly notificationsClient: ClientProxy,
   ) {}
+
+  testNotifyEmail(notifyEmailDto: NotifyEmailDto) {
+    return this.notificationsClient.emit('notify_email', notifyEmailDto);
+  }
 
   async create(productInput: CreateProductInput): Promise<Product> {
     const slug = generateSlug({

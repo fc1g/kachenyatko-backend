@@ -13,6 +13,7 @@ COPY tsconfig.json nest-cli.json ./
 
 # Gateway package
 # COPY apps/gateway/package.json apps/gateway/
+# COPY apps/gateway/pnpm-lock.yaml apps/gateway/
 
 RUN pnpm install --frozen-lockfile
 
@@ -50,6 +51,7 @@ COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/pnpm-lock.yaml ./
 COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./
 # COPY --from=builder /usr/src/app/apps/gateway/package.json apps/gateway/package.json
+# COPY --from=builder /usr/src/app/apps/gateway/pnpm-lock.yaml apps/gateway/pnpm-lock.yaml
 
 COPY --from=builder /usr/src/app/dist ./dist
 

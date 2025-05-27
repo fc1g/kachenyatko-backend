@@ -46,15 +46,14 @@ export class JwtAuthGuard implements CanActivate {
       })
       .pipe(
         tap((res) => {
-          if (roles) {
-            for (const role of roles) {
-              if (!res.roles.map((r) => r.name).includes(role)) {
-                this.logger.error(
-                  `The user does not have valid roles: ${role}`,
-                );
-                throw new UnauthorizedException();
-              }
-            }
+          if (
+            roles &&
+            !roles.some((role) => res.roles.map((r) => r.name).includes(role))
+          ) {
+            this.logger.error(
+              `The user does not have valid roles: ${JSON.stringify(roles)}`,
+            );
+            throw new UnauthorizedException();
           }
           request.user = res;
         }),

@@ -1,0 +1,21 @@
+{
+  "name": "notifications",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/apps/notifications/main.js",
+  "private": true,
+  "scripts": {
+    "build": "nest build notifications",
+    "start": "nest start notifications",
+    "start:dev": "nest start notifications --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/nodemailer": "^6.4.17",
+    "backend": "workspace:*",
+    "nodemailer": "^7.0.3"
+  },
+  "packageManager": "pnpm@10.11.0"
+}

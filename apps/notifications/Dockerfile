@@ -11,9 +11,9 @@ FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY tsconfig.json nest-cli.json ./
 
-# Products package
-COPY apps/products/package.json apps/products/
-COPY apps/products/pnpm-lock.yaml apps/products/
+# Notifications package
+COPY apps/notifications/package.json apps/notifications/
+COPY apps/notifications/pnpm-lock.yaml apps/notifications/
 
 RUN pnpm install --frozen-lockfile
 
@@ -22,19 +22,17 @@ FROM deps AS dev
 ARG NODE_ENV=development
 ENV NODE_ENV=${NODE_ENV}
 
-COPY apps/products apps/products
+COPY apps/notifications apps/notifications
 COPY libs libs
-
-EXPOSE 3001
-
-CMD ["pnpm", "start:dev", "products"]
+  
+CMD ["pnpm", "start:dev", "notifications"]
 
 FROM deps AS builder
 
-COPY apps/products apps/products
+COPY apps/notifications apps/notifications
 COPY libs libs
 
-RUN pnpm build products
+RUN pnpm build notifications
 
 FROM node:23-alpine AS runner
 
@@ -50,13 +48,11 @@ RUN corepack enable pnpm
 COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/pnpm-lock.yaml ./
 COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./
-COPY --from=builder /usr/src/app/apps/products/package.json apps/products/package.json
-COPY --from=builder /usr/src/app/apps/products/pnpm-lock.yaml apps/products/pnpm-lock.yaml
+COPY --from=builder /usr/src/app/apps/notifications/package.json apps/notifications/package.json
+COPY --from=builder /usr/src/app/apps/notifications/pnpm-lock.yaml apps/notifications/pnpm-lock.yaml
 
 COPY --from=builder /usr/src/app/dist ./dist
 
 RUN pnpm install --prod --ignore-scripts --frozen-lockfile
 
-EXPOSE 3001
-
-CMD ["node", "dist/apps/products/main.js"]
+CMD ["node", "dist/apps/notifications/main.js"]

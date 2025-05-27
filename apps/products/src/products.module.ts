@@ -68,6 +68,17 @@ import { SpecificationsModule } from './specifications/specifications.module';
         }),
         inject: [ConfigService],
       },
+      {
+        name: SERVICE.NOTIFICATIONS,
+        useFactory: (config: ConfigService) => ({
+          transport: Transport.TCP,
+          options: {
+            host: config.getOrThrow<string>('NOTIFICATIONS_HOST'),
+            port: config.getOrThrow<number>('NOTIFICATIONS_PORT'),
+          },
+        }),
+        inject: [ConfigService],
+      },
     ]),
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,

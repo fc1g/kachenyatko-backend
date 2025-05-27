@@ -51,6 +51,7 @@ COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/pnpm-lock.yaml ./
 COPY --from=builder /usr/src/app/pnpm-workspace.yaml ./
 COPY --from=builder /usr/src/app/apps/auth/package.json apps/auth/package.json
+COPY --from=builder /usr/src/app/apps/auth/pnpm-lock.yaml apps/auth/pnpm-lock.yaml
 
 COPY --from=builder /usr/src/app/dist ./dist
 
