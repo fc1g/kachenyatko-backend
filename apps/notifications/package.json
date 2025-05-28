@@ -13,10 +13,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/nodemailer": "^6.4.17",
     "backend": "workspace:*",
     "nodemailer": "^7.0.3",
     "p-limit": "^6.2.0"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17"
   },
   "packageManager": "pnpm@10.11.0"
 }

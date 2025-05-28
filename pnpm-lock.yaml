@@ -247,9 +247,6 @@ importers:
 
   apps/notifications:
     dependencies:
-      '@types/nodemailer':
-        specifier: ^6.4.17
-        version: 6.4.17
       backend:
         specifier: workspace:*
         version: link:../..
@@ -259,6 +256,10 @@ importers:
       p-limit:
         specifier: ^6.2.0
         version: 6.2.0
+    devDependencies:
+      '@types/nodemailer':
+        specifier: ^6.4.17
+        version: 6.4.17
 
   apps/products:
     dependencies:
