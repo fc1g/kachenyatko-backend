@@ -1,5 +1,6 @@
+import { JwtAuthGuard, ROLE_NAME, Roles } from '@app/common';
 import { StatusResponseDto } from '@app/common/dto/status-response.dto';
-import { ParseUUIDPipe } from '@nestjs/common';
+import { ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateProductInput } from './dto/create-product.input';
 import { PaginationOptionsInput } from './dto/pagination-options.input';
@@ -14,6 +15,8 @@ export class ProductsResolver {
   constructor(private readonly productsService: ProductsService) {}
 
   @Mutation(() => Product, { name: 'createProduct' })
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLE_NAME.ADMIN, ROLE_NAME.MODERATOR)
   createProduct(
     @Args('createProductInput') createProductInput: CreateProductInput,
   ) {
@@ -68,6 +71,8 @@ export class ProductsResolver {
 
   // HACK:
   @Mutation(() => Product, { name: 'updateProduct' })
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLE_NAME.ADMIN, ROLE_NAME.MODERATOR)
   updateProduct(
     @Args('id', ParseUUIDPipe) id: string,
     @Args('updateProductInput') updateProductInput: UpdateProductInput,
@@ -76,6 +81,8 @@ export class ProductsResolver {
   }
 
   @Mutation(() => StatusResponseDto, { name: 'removeProduct' })
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLE_NAME.ADMIN, ROLE_NAME.MODERATOR)
   removeProduct(@Args('id', ParseUUIDPipe) id: string) {
     return this.productsService.remove(id);
   }
