@@ -9,6 +9,7 @@ import { plainToClass } from 'class-transformer';
 import { RolesService } from '../roles/roles.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { GetUserDto } from './dto/get-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
@@ -74,6 +75,26 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    return this.repo.findOneAndUpdate({ id }, 'User', updateUserDto);
+  }
+
+  async updateRefreshToken(
+    id: string,
+    refreshToken: string | null,
+  ): Promise<User> {
+    if (refreshToken) {
+      const hash = await bcrypt.hash(refreshToken, 10);
+      return this.update(id, {
+        hashedRefreshToken: hash,
+      });
+    }
+
+    return this.update(id, {
+      hashedRefreshToken: null,
+    });
   }
 
   async remove(id: string): Promise<StatusResponseDto> {

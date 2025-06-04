@@ -15,6 +15,9 @@ export class User extends AbstractEntity<User> {
   @Column('varchar', { length: 100, nullable: true })
   password: string | null;
 
+  @Column('varchar', { nullable: true })
+  hashedRefreshToken: string | null;
+
   @ManyToMany(() => Role)
   @JoinTable({
     name: 'user_roles',

@@ -33,6 +33,9 @@ import { UsersModule } from './users/users.module';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION: Joi.number().required(),
 
+        REFRESH_TOKEN_SECRET: Joi.string().required(),
+        REFRESH_TOKEN_EXPIRATION: Joi.number().required(),
+
         OAUTH_GOOGLE_CLIENT_ID: Joi.string().required(),
         OAUTH_GOOGLE_CLIENT_SECRET: Joi.string().required(),
         OAUTH_GOOGLE_CALLBACK_URL: Joi.string().required(),

@@ -38,10 +38,20 @@ export abstract class AbstractRepository<T extends AbstractEntity<T>> {
   ): Promise<T> {
     const entity = await this.repo.findOne({ where, ...options });
 
+    const entries = Object.entries(where);
+    let messageDetails = '';
+    if (entries.length) {
+      const [key, value] = entries[0] as [string, string];
+
+      messageDetails = `${key}: ${value}`;
+    } else {
+      messageDetails = JSON.stringify(where);
+    }
+
     if (!entity) {
       this.logger.warn('Document not found with where', where);
       throw new NotFoundException(
-        `${entityName} not found. Where: ${JSON.stringify(where)}`,
+        `${entityName} not found. (${messageDetails})`,
       );
     }
 

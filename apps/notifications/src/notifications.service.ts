@@ -13,6 +13,7 @@ import pLimit from 'p-limit';
 import { NotifyEmailDto } from './dto/notify-email.dto';
 import { PromoPayloadDto } from './dto/promo-payload.dto';
 import { SubscriptionDto } from './dto/subscription.dto';
+import { UpdateEmailDto } from './dto/update-email.dto';
 import { NewsletterSubscription } from './entities/newsletter-subscription.entity';
 import { NotificationsRepository } from './notifications.repository';
 
@@ -85,6 +86,23 @@ export class NotificationsService {
     throw new UnprocessableEntityException(
       'Email already subscribed to newsletter',
     );
+  }
+
+  async updateEmail(
+    updateEmailDto: UpdateEmailDto,
+  ): Promise<StatusResponseDto> {
+    try {
+      await this.repo.findOneAndUpdate(
+        { email: updateEmailDto.email },
+        'Email',
+        { email: updateEmailDto.email, active: true },
+      );
+
+      return { statusCode: 200, message: 'Email updated' };
+    } catch (err) {
+      this.logger.error(err);
+      return { statusCode: 500, message: 'Failed to update email' };
+    }
   }
 
   async unsubscribeFromNewsletter(

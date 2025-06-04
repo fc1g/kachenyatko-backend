@@ -3,8 +3,6 @@ import {
   AuthServiceController,
   AuthServiceControllerMethods,
   CurrentUser,
-  Serialize,
-  SignedUpDto,
   User,
   UserMessage,
 } from '@app/common';
@@ -14,11 +12,13 @@ import {
   Get,
   HttpCode,
   Post,
+  Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { Payload } from '@nestjs/microservices';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleOauthGuard } from './guards/google-oauth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -34,10 +34,9 @@ export class AuthController implements AuthServiceController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   login(@CurrentUser() user: User, @Res({ passthrough: true }) res: Response) {
-    return this.authService.signToken(user, res);
+    return this.authService.getTokens({ userId: user.id }, res);
   }
 
-  @Serialize(SignedUpDto)
   @Post('signup')
   async signup(
     @Body() createUserDto: CreateUserDto,
@@ -49,13 +48,22 @@ export class AuthController implements AuthServiceController {
   @Post('logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
-  logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('Authentication', {
-      httpOnly: true,
-      sameSite: 'lax',
-      path: '/',
-    });
-    return { statusCode: 200, message: 'Logged out successfully' };
+  logout(@CurrentUser() user: User, @Res({ passthrough: true }) res: Response) {
+    return this.authService.logout(user, res);
+  }
+
+  @Post('refresh')
+  @HttpCode(200)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies['Refresh'] as string;
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+
+    return this.authService.refresh(refreshToken, res);
   }
 
   @Get('google')

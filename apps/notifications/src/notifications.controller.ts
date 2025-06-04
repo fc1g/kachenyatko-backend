@@ -4,6 +4,7 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 import { NotifyEmailDto } from './dto/notify-email.dto';
 import { PromoPayloadDto } from './dto/promo-payload.dto';
 import { SubscriptionDto } from './dto/subscription.dto';
+import { UpdateEmailDto } from './dto/update-email.dto';
 import { NotificationsService } from './notifications.service';
 
 @Controller()
@@ -18,6 +19,11 @@ export class NotificationsController {
   @Post('unsubscribe')
   async unsubscribeFromNewsletter(@Body() body: SubscriptionDto) {
     return this.notificationsService.unsubscribeFromNewsletter(body);
+  }
+
+  @Post('update-email')
+  async updateEmail(@Body() body: UpdateEmailDto) {
+    return this.notificationsService.updateEmail(body);
   }
 
   @Post('send-promo')

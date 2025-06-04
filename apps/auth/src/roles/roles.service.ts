@@ -36,15 +36,15 @@ export class RolesService {
   }
 
   private async validateCreateRole(
-    createUserDto: CreateRoleDto,
+    createRoleDto: CreateRoleDto,
   ): Promise<void> {
     try {
-      await this.findOne({ name: createUserDto.name });
+      await this.findOne({ name: createRoleDto.name });
     } catch (err) {
       console.error(err);
       return;
     }
 
-    throw new UnprocessableEntityException('Email already exists');
+    throw new UnprocessableEntityException('Role already exists');
   }
 }

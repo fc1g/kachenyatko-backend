@@ -1,7 +1,13 @@
 import { AUTH_PROVIDER, User } from '@app/common';
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { GoogleTokenPayload } from './interfaces/google-token-payload.interface';
 import { TokenPayload } from './interfaces/token-payload.interface';
@@ -17,57 +23,124 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  signToken(user: User, res: Response) {
-    const tokenPayload: TokenPayload = {
-      userId: user.id.toString(),
-    };
+  getAccessToken(tokenPayload: TokenPayload) {
+    return this.jwtService.sign(tokenPayload);
+  }
 
-    const expires = new Date();
-    expires.setSeconds(
-      expires.getSeconds() +
-        this.configService.getOrThrow<number>('JWT_EXPIRATION'),
+  getRefreshToken(tokenPayload: TokenPayload) {
+    return this.jwtService.sign(tokenPayload, {
+      secret: this.configService.getOrThrow<string>('REFRESH_TOKEN_SECRET'),
+      expiresIn: `${this.configService.getOrThrow<number>('REFRESH_TOKEN_EXPIRATION')}s`,
+    });
+  }
+
+  async getTokens(tokenPayload: TokenPayload, res: Response) {
+    const accessToken = this.getAccessToken(tokenPayload);
+    const refreshToken = this.getRefreshToken(tokenPayload);
+
+    await this.usersService.updateRefreshToken(
+      tokenPayload.userId,
+      refreshToken,
     );
 
-    const token = this.jwtService.sign(tokenPayload);
-
-    res.cookie('Authentication', token, {
+    res.cookie('Refresh', refreshToken, {
       httpOnly: true,
       sameSite: 'lax',
-      expires,
       path: '/',
+      secure:
+        this.configService.getOrThrow<string>('NODE_ENV') === 'production',
+      maxAge:
+        this.configService.getOrThrow<number>('REFRESH_TOKEN_EXPIRATION') *
+        1000,
     });
 
-    return { token };
+    return { accessToken };
   }
 
   async signup(createUserDto: CreateUserDto, res: Response) {
     const user = await this.usersService.create(createUserDto);
 
-    const { token } = this.signToken(user, res);
+    return this.getTokens({ userId: user.id }, res);
+  }
 
-    return { user, token };
+  async logout(user: User, res: Response) {
+    await this.usersService.updateRefreshToken(user.id, null);
+
+    const cookieOptions = {
+      httpOnly: true,
+      sameSite: 'lax' as const,
+      path: '/',
+      secure:
+        this.configService.getOrThrow<string>('NODE_ENV') === 'production',
+    };
+
+    res.clearCookie('Refresh', { ...cookieOptions });
+
+    return { statusCode: 200, message: 'Logged out successfully' };
+  }
+
+  async refresh(refreshToken: string, res: Response) {
+    let payload: TokenPayload;
+    try {
+      payload = this.jwtService.verify(refreshToken, {
+        secret: this.configService.getOrThrow<string>('REFRESH_TOKEN_SECRET'),
+      });
+    } catch (err) {
+      this.logger.error(err);
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const user = await this.getUserIfRefreshTokenMatches(refreshToken, payload);
+
+    return this.getTokens({ userId: user.id }, res);
+  }
+
+  private async getUserIfRefreshTokenMatches(
+    refreshToken: string,
+    tokenPayload: TokenPayload,
+  ) {
+    const user = await this.usersService.getUser({ id: tokenPayload.userId });
+    if (!user.hashedRefreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+
+    const isRefreshTokenMatching = await bcrypt.compare(
+      refreshToken,
+      user.hashedRefreshToken,
+    );
+
+    if (!isRefreshTokenMatching) {
+      throw new UnauthorizedException('Refresh token is not valid');
+    }
+
+    return user;
   }
 
   async loginWithGoogle(payload: GoogleTokenPayload, res: Response) {
+    let user: User;
     try {
-      const user = await this.usersService.getUser({ email: payload.email });
-
-      if (!user) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
-
-      this.signToken(user, res);
+      user = await this.usersService.getUser({ email: payload.email });
     } catch (err) {
       this.logger.error(err);
 
-      const user = await this.usersService.create({
+      user = await this.usersService.create({
         email: payload.email,
         password: null,
         provider: AUTH_PROVIDER.GOOGLE,
       });
-
-      this.signToken(user, res);
     }
+
+    if (!user.provider) {
+      throw new BadRequestException('Please login with your password');
+    }
+
+    if (user.provider && user.provider !== AUTH_PROVIDER.GOOGLE) {
+      throw new UnauthorizedException(
+        'Credentials are not valid. Please login with your provider',
+      );
+    }
+
+    await this.getTokens({ userId: user.id }, res);
 
     return res.redirect(
       this.configService.getOrThrow<string>('OAUTH_GOOGLE_REDIRECT_URL'),
